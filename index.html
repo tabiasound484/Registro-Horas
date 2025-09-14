@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registrar Horas</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      max-width: 500px; 
+      margin: 40px auto; 
+      padding: 20px; 
+      background-color: #f8f9fa; 
+    }
+    h2 { 
+      text-align: center; 
+      color: #2c3e50; 
+      margin-bottom: 25px; 
+    }
+    input, textarea { 
+      width: 100%; 
+      padding: 12px; 
+      margin: 12px 0; 
+      border: 1px solid #ddd; 
+      border-radius: 6px; 
+      font-size: 16px; 
+    }
+    button { 
+      width: 100%; 
+      background-color: #4CAF50; 
+      color: white; 
+      padding: 14px; 
+      border: none; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      font-size: 18px; 
+      font-weight: bold; 
+      margin-top: 20px; 
+    }
+    button:hover { 
+      background-color: #45a049; 
+    }
+    .success { 
+      color: green; 
+      text-align: center; 
+      font-weight: bold; 
+      margin: 15px 0; 
+      padding: 10px; 
+      background-color: #e8f5e9; 
+      border-radius: 6px; 
+    }
+  </style>
+</head>
+<body>
+  <h2>📅 Registrar Horas de Trabajo</h2>
+
+  <input type="text" id="nombre" placeholder="Tu nombre completo" required>
+  <input type="date" id="fecha" required>
+  <input type="time" id="entrada" placeholder="Hora de entrada" required>
+  <input type="time" id="salida" placeholder="Hora de salida">
+  <textarea id="observaciones" placeholder="Observaciones (opcional)" rows="3"></textarea>
+
+  <button onclick="registrar()">✅ Registrar Horas</button>
+  <div id="mensaje"></div>
+
+  <script>
+    async function registrar() {
+      const nombre = document.getElementById("nombre").value.trim();
+      const fecha = document.getElementById("fecha").value;
+      const entrada = document.getElementById("entrada").value;
+      const salida = document.getElementById("salida").value;
+      const observaciones = document.getElementById("observaciones").value.trim();
+
+      if (!nombre || !fecha || !entrada) {
+        alert("Completa todos los campos obligatorios.");
+        return;
+      }
+
+      const data = { nombre, fecha, entrada, salida, observaciones };
+      const url = "https://script.google.com/macros/s/AKfycbxYuHjAavbxVIJ5lpzGA8B1tS1BLjWwDsRyoVe3TrLXq1_ifr2KMchcA7UYsFr2V80g/exec";
+
+      try {
+        const response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+        const result = await response.json();
+
+        if (result.result === "success") {
+          document.getElementById("mensaje").innerHTML = "<div class='success'>✅ ¡Horas registradas con éxito!</div>";
+          document.getElementById("nombre").value = "";
+          document.getElementById("fecha").value = new Date().toISOString().split('T')[0];
+          document.getElementById("entrada").value = "";
+          document.getElementById("salida").value = "";
+          document.getElementById("observaciones").value = "";
+        } else {
+          alert("Error: " + result.error);
+        }
+      } catch (err) {
+        document.getElementById("mensaje").innerHTML = "<div class='error'>❌ Error de conexión. Verifica tu internet.</div>";
+      }
+    }
+
+    // Poner fecha actual por defecto
+    document.getElementById("fecha").value = new Date().toISOString().split('T')[0];
+  </script>
+</body>
+</html>
